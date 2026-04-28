@@ -17,6 +17,17 @@
         socket.on("click", function(data) {
             document.getElementById("clicks").textContent = data.count;
         });
+        // Listen for clicks anywhere on the page
+        document.addEventListener("click", function() {
+            socket.emit("click");
+        });
+
+        // Listen for spacebar press
+        document.addEventListener("keydown", function(event) {
+            if (event.code === "Space") {
+                socket.emit("click");
+            }
+        });
 
         // Function to send messages
         function sendMessage() {
