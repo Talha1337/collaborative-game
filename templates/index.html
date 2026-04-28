@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask WebSocket Chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        var socket = io();
+        var username = prompt("Enter your name:");  // Ask for username
+        socket.emit("join", username);  // Notify server of new user
+
+        // Listen for messages from server
+        socket.on("message", function(data) {
+            var messages = document.getElementById("messages");
+            messages.innerHTML += `<p>${data}</p>`;
+        });
+        socket.on("click", function(data) {
+            document.getElementById("clicks").textContent = data.count;
+        });
+
+        // Function to send messages
+        function sendMessage() {
+            var msgInput = document.getElementById("msg");
+            var message = msgInput.value;
+            socket.send(message);
+            msgInput.value = "";
+        }
+
+        function onClick() {
+            socket.emit("click");  // Just notify server, don't increment locally
+        }
+    </script>
+
+    
+</head>
+<body>
+    <button type="button" onClick="onClick()">Click me</button>
+    <p>Clicks: <a id="clicks">0</a></p>
+    <h2>Flask WebSocket Chat</h2>
+    <input id="msg" type="text" placeholder="Enter your message">
+    <button onclick="sendMessage()">Send</button>
+    <div id="messages"></div>
+</body>
+</html>
