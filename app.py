@@ -9,6 +9,7 @@ socketio = SocketIO(app)
 # Dictionary to store users and their assigned rooms
 users = {}
 click_count = 0
+cursor_positions = {}  # Dictionary to store cursor positions by session
 
 
 @app.route("/")
@@ -47,6 +48,22 @@ def handle_click():
     click_count += 1
     username = users.get(request.sid, "Anonymous")
     emit("click", {"username": username, "count": click_count}, broadcast=True)
+
+
+# Handle cursor position updates
+@socketio.on("cursor_move")
+def handle_cursor_move(data):
+    username = users.get(request.sid, "Anonymous")
+    cursor_positions[request.sid] = {
+        "username": username,
+        "x": data["x"],
+        "y": data["y"],
+    }
+    emit(
+        "cursor_move",
+        {"username": username, "x": data["x"], "y": data["y"]},
+        broadcast=True,
+    )
 
 
 if __name__ == "__main__":
