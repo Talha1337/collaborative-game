@@ -2,9 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Flask WebSocket Chat</title>
+    <title>Flappy Bird - Multiplayer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='flappybird.css') }}">
     <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #333;
+            color: white;
+        }
+        
+        canvas {
+            border: 2px solid white;
+            display: block;
+            margin: 20px auto;
+        }
+        
         .cursor-position {
             position: fixed;
             top: 10px;
@@ -16,7 +33,9 @@
             font-family: monospace;
             font-size: 12px;
             z-index: 1000;
+            color: black;
         }
+        
         .user-cursor {
             position: absolute;
             width: 10px;
@@ -25,6 +44,7 @@
             pointer-events: none;
             z-index: 100;
         }
+        
         .cursor-label {
             position: absolute;
             top: -20px;
@@ -36,33 +56,76 @@
             font-size: 10px;
             white-space: nowrap;
         }
+        
+        .game-container {
+            text-align: center;
+        }
+        .start-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.9);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 2000;
+        }
+        .start-screen.hidden { display: none; }
+        
+        .chat-area {
+            margin-top: 20px;
+            border: 1px solid white;
+            padding: 10px;
+            width: 360px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
     </style>
+</head>
+<body>
+    <div class="cursor-position">
+        <div id="myPosition">Your cursor: (0, 0)</div>
+    </div>
+    <div id="startScreen" class="start-screen">
+    <h1>Flappy Bird Multiplayer</h1>
+    <p>Press Start to play!</p>
+    <button onclick="startGame()">Start</button>
+    </div>
+    
+    
+    <div class="game-container">
+        <h1>Flappy Bird - Multiplayer</h1>
+        <p>Press SPACE, ARROW UP, or X to jump</p>
+        <canvas id="board"></canvas>
+    </div>
+    
+    <div class="chat-area">
+        <div id="messages"></div>
+        <input id="msg" type="text" placeholder="Enter your message">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
     <script>
         var socket = io();
-        var username = prompt("Enter your name:");  // Ask for username
-        socket.emit("join", username);  // Notify server of new user
-        var userCursors = {};  // Store cursor elements for each user
+        var username = "";
+        var userCursors = {};
 
-        // Listen for messages from server
+        // This will be overridden by flappybird.js, but we need it for other features
         socket.on("message", function(data) {
             var messages = document.getElementById("messages");
             messages.innerHTML += `<p>${data}</p>`;
+            messages.scrollTop = messages.scrollHeight;
         });
+
         socket.on("click", function(data) {
             document.getElementById("clicks").textContent = data.count;
         });
 
-        // Track mouse movement and send to server
         document.addEventListener("mousemove", function(event) {
             socket.emit("cursor_move", {x: event.clientX, y: event.clientY});
             document.getElementById("myPosition").textContent = `Your cursor: (${event.clientX}, ${event.clientY})`;
         });
 
-        // Listen for cursor position updates from other users
         socket.on("cursor_move", function(data) {
-            if (data.username === username) return;  // Don't show own cursor from broadcast
+            if (data.username === username) return;
 
-            // Create or update cursor element
             if (!userCursors[data.username]) {
                 var cursorDiv = document.createElement("div");
                 cursorDiv.className = "user-cursor";
@@ -75,12 +138,10 @@
                 userCursors[data.username] = cursorDiv;
             }
 
-            // Update cursor position
             userCursors[data.username].style.left = data.x + "px";
             userCursors[data.username].style.top = data.y + "px";
         });
 
-        // Generate consistent color for each username
         function getColorForUsername(name) {
             var hash = 0;
             for (var i = 0; i < name.length; i++) {
@@ -90,64 +151,15 @@
             return "#" + ("000000" + color).slice(-6);
         }
 
-        // Listen for clicks anywhere on the page
-        document.addEventListener("click", function() {
-            socket.emit("click");
-        });
-
-        // Listen for spacebar press
-        document.addEventListener("keydown", function(event) {
-            if (event.code === "Space") {
-                socket.emit("click");
-            }
-        });
-
-        // Function to send messages
         function sendMessage() {
             var msgInput = document.getElementById("msg");
             var message = msgInput.value;
             socket.send(message);
             msgInput.value = "";
         }
-
-        function onClick() {
-            socket.emit("click");  // Just notify server, don't increment locally
-        }
-
-
-        function startGame() {
-        myGamePiece = new component(30, 30, "red", 10, 120);
-        myGamePiece.gravity = 0.05;
-        myScore = new component("30px", "Consolas", "black", 280, 40, "text");
-        myGameArea.start();
-        }
-
-        var myGameArea = {
-        canvas : document.createElement("canvas"),
-        start : function() {
-            this.canvas.width = 480;
-            this.canvas.height = 270;
-            this.context = this.canvas.getContext("2d");
-            document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-            this.frameNo = 0;
-        },
-        clear : function() {
-            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        }
-        }
     </script>
 
-    
-</head>
-<body>
-    <div class="cursor-position">
-        <div id="myPosition">Your cursor: (0, 0)</div>
-    </div>
-    <button type="button" onClick="onClick()">Click me</button>
-    <p>Clicks: <a id="clicks">0</a></p>
-    <h2>Flask WebSocket Chat</h2>
-    <input id="msg" type="text" placeholder="Enter your message">
-    <button onclick="sendMessage()">Send</button>
-    <div id="messages"></div>
+    <script src="{{ url_for('static', filename='flappybird.js') }}"></script>
 </body>
+
 </html>
