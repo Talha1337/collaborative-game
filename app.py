@@ -124,7 +124,7 @@ def spawn_pipe():
         "x": game_state.board_width,
         "y": random_pipe_y + game_state.pipe_height + opening_space,
         "width": game_state.pipe_width,
-        "height": game_state.pipe_height,
+        "height": game_state.board_height - (random_pipe_y + game_state.pipe_height + opening_space),
         "passed": False,
     }
     game_state.pipes.append(bottom_pipe)
