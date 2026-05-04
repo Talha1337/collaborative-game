@@ -33,7 +33,6 @@ let score = 0;
 
 function startGame() {
     document.getElementById('startScreen').classList.add('hidden');
-    console.log("GAME STARTED");
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
@@ -66,7 +65,6 @@ function startGame() {
         gameOver = data.game_over;
         
         // Render the game
-        console.log("Game update received:", data);
         render();
     });
 
@@ -74,7 +72,6 @@ function startGame() {
     document.addEventListener("keydown", function(event) {
         if (event.code === "Space" || event.code === "ArrowUp" || event.code === "KeyX") {
             socket.emit("player_jump");
-            console.log("Jump!");
         }
     });
 
@@ -82,7 +79,6 @@ function startGame() {
 }
 
 function render() {
-    console.log("Rendering game...");
     requestAnimationFrame(render);
     
     context.clearRect(0, 0, board.width, board.height);
@@ -91,7 +87,6 @@ function render() {
     context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
 
     // Draw pipes
-    console.log("Drawing pipes:", pipeArray);
     for (let i = 0; i < pipeArray.length; i++) {
         let pipe = pipeArray[i];
         if (pipe.y < 0) {
