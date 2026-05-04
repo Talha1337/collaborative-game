@@ -54,8 +54,6 @@ function startGame() {
 
     // Initialize Socket.IO
     socket = io();
-    username = prompt("Enter your name:");
-    socket.emit("join", username);
 
     // Listen for game state updates from server
     socket.on("game_update", function(data) {
@@ -76,7 +74,7 @@ function startGame() {
             socket.emit("player_jump");
 
             if (!audioStarted) {
-     
+
             audio.play();
             audioStarted = true;
         }
