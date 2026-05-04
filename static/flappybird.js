@@ -30,7 +30,8 @@ let bottomPipeImg;
 //game state
 let gameOver = false;
 let score = 0;
-
+let audioStarted = false;
+let audio = document.getElementById('audio_play').querySelector('audio');
 function startGame() {
     document.getElementById('startScreen').classList.add('hidden');
     board = document.getElementById("board");
@@ -63,15 +64,22 @@ function startGame() {
         pipeArray = data.pipes;
         score = data.score;
         gameOver = data.game_over;
-        
+
         // Render the game
         render();
     });
+
 
     // Listen for spacebar to jump
     document.addEventListener("keydown", function(event) {
         if (event.code === "Space" || event.code === "ArrowUp" || event.code === "KeyX") {
             socket.emit("player_jump");
+
+            if (!audioStarted) {
+     
+            audio.play();
+            audioStarted = true;
+        }
         }
     });
 
@@ -80,7 +88,7 @@ function startGame() {
 
 function render() {
     requestAnimationFrame(render);
-    
+
     context.clearRect(0, 0, board.width, board.height);
 
     // Draw bird

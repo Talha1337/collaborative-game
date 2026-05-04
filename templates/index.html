@@ -19,13 +19,13 @@
             background-color: #333;
             color: white;
         }
-        
+
         canvas {
             border: 2px solid white;
             display: block;
             margin: 20px auto;
         }
-        
+
         .cursor-position {
             position: fixed;
             top: 10px;
@@ -39,7 +39,7 @@
             z-index: 1000;
             color: black;
         }
-        
+
         .user-cursor {
             position: absolute;
             width: 10px;
@@ -48,7 +48,7 @@
             pointer-events: none;
             z-index: 100;
         }
-        
+
         .cursor-label {
             position: absolute;
             top: -20px;
@@ -60,7 +60,7 @@
             font-size: 10px;
             white-space: nowrap;
         }
-        
+
         .game-container {
             text-align: center;
         }
@@ -72,7 +72,7 @@
             z-index: 2000;
         }
         .start-screen.hidden { display: none; }
-        
+
         .chat-area {
             border: 1px solid white;
             padding: 10px;
@@ -91,20 +91,25 @@
     <p>Press Start to play!</p>
     <button onclick="startGame()">Start</button>
     </div>
-    
-    
+
+
+    <div class="game-container">
+
+
     <div class="game-container" style="float:left;">
         <h1>Flappy Bird - Multiplayer</h1>
         <p>Press SPACE, ARROW UP, or X to jump</p>
         <canvas id="board"></canvas>
     </div>
-    
-    <div class="chat-area" style="float:right;">
+
+    <div class="chat-area">
         <div id="messages"></div>
         <input id="msg" type="text" placeholder="Enter your message">
         <button onclick="sendMessage()">Send</button>
     </div>
-
+    <div id="audio_play">
+    <audio src="static/bgm_mario.mp3" autoplay loop></audio>
+    </div>
     <script src="{{ url_for('static', filename='logic.js') }}"></script>
     <script src="{{ url_for('static', filename='flappybird.js') }}"></script>
 </body>
