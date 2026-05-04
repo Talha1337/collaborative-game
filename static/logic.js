@@ -7,7 +7,20 @@
         // Listen for messages from server
         socket.on("message", function(data) {
             var messages = document.getElementById("messages");
-            messages.innerHTML += `<p>${data}</p>`;
+            // Create a new message element with timestamp, username, and message
+            var messageElement = document.createElement("p");
+            messageElement.textContent = `[${data.timestamp}] ${data.username}: ${data.message}`;
+            messages.appendChild(messageElement);
+            if (data.user_id === socket.id) {
+                messageElement.style.fontWeight = "bold";
+                messageElement.style.borderLeft = "3px solid #4a90e2"; // Highlight own messages
+            }
+            else {
+                messageElement.classList.add("other-message");  // Style for other users' messages
+            }
+                messages.scrollTop = messages.scrollHeight;  // Auto-scroll to bottom
+
+
         });
         socket.on("click", function(data) {
             document.getElementById("clicks").textContent = data.count;
@@ -76,3 +89,5 @@
         function onClick() {
             socket.emit("click");  // Just notify server, don't increment locally
         }
+
+        window.connection = socket

@@ -31,7 +31,7 @@ let bottomPipeImg;
 let gameOver = false;
 let score = 0;
 let audioStarted = false;
-let audio = document.getElementById('audio_play').querySelector('audio');
+let audio = document.getElementsByTagName('audio');
 function startGame() {
     document.getElementById('startScreen').classList.add('hidden');
     board = document.getElementById("board");
@@ -53,7 +53,7 @@ function startGame() {
     bottomPipeImg.src = "./static/bottompipe.png";
 
     // Initialize Socket.IO
-    socket = io();
+    socket = window.connection || io();
 
     // Listen for game state updates from server
     socket.on("game_update", function(data) {
@@ -74,8 +74,7 @@ function startGame() {
             socket.emit("player_jump");
 
             if (!audioStarted) {
-
-            audio.play();
+            audio[0].play();
             audioStarted = true;
         }
         }
@@ -93,6 +92,7 @@ function render() {
     context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
 
     // Draw pipes
+
     for (let i = 0; i < pipeArray.length; i++) {
         let pipe = pipeArray[i];
         if (pipe.y < 0) {

@@ -3,6 +3,7 @@ from flask_socketio import SocketIO, send, emit, join_room, leave_room
 import threading
 import time
 import random
+from datetime import datetime
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "your_secret_key"
@@ -149,7 +150,9 @@ def handle_join(username):
     global game_loop_thread, game_loop_running
     users[request.sid] = username
     join_room(username)
-    emit("message", f"{username} joined the chat", room=username)
+    date_time = datetime.now().strftime("%H:%M:%S")
+    data = {'username': 'System', 'message': f"{username} joined the chat", 'timestamp': date_time, 'user_id': request.sid}
+    emit("message", data, broadcast=True)
     # Send current click count to the new user
     emit("click", {"username": username, "count": click_count}, room=username)
 
@@ -163,8 +166,13 @@ def handle_join(username):
 # Handle user messages
 @socketio.on("message")
 def handle_message(data):
+    global users
+    date_time = datetime.now().strftime("%H:%M:%S")
     username = users.get(request.sid, "Anonymous")  # Get the user's name
-    emit("message", f"{username}: {data}", broadcast=True)  # Send to everyone
+    print(users)
+    print(f"Received message from {request.sid}: {data}")
+    data = {'username': username, 'message': data, 'timestamp': date_time, 'user_id': request.sid}
+    emit("message", data, broadcast=True)  # Send to everyone
 
 
 # Handle disconnects
@@ -172,7 +180,9 @@ def handle_message(data):
 def handle_disconnect():
     global game_loop_running
     username = users.pop(request.sid, "Anonymous")
-    emit("message", f"{username} left the chat", broadcast=True)
+    date_time = datetime.now().strftime("%H:%M:%S")
+    data = {'username': 'System', 'message': f"{username} left the chat", 'timestamp': date_time, 'user_id': request.sid}
+    emit("message", data, broadcast=True)
 
     # Stop game loop if no users left
     if len(users) == 0:
