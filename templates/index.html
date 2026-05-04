@@ -5,7 +5,6 @@
     <title>Flappy Bird - Multiplayer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <link rel="stylesheet" href="static/style.css">
-    <script src="static/logic.js"></script>
 
 
 
@@ -75,7 +74,6 @@
         .start-screen.hidden { display: none; }
         
         .chat-area {
-            margin-top: 20px;
             border: 1px solid white;
             padding: 10px;
             width: 360px;
@@ -95,75 +93,19 @@
     </div>
     
     
-    <div class="game-container">
+    <div class="game-container" style="float:left;">
         <h1>Flappy Bird - Multiplayer</h1>
         <p>Press SPACE, ARROW UP, or X to jump</p>
         <canvas id="board"></canvas>
     </div>
     
-    <div class="chat-area">
+    <div class="chat-area" style="float:right;">
         <div id="messages"></div>
         <input id="msg" type="text" placeholder="Enter your message">
         <button onclick="sendMessage()">Send</button>
     </div>
 
-    <script>
-        var socket = io();
-        var username = "";
-        var userCursors = {};
-
-        // This will be overridden by flappybird.js, but we need it for other features
-        socket.on("message", function(data) {
-            var messages = document.getElementById("messages");
-            messages.innerHTML += `<p>${data}</p>`;
-            messages.scrollTop = messages.scrollHeight;
-        });
-
-        socket.on("click", function(data) {
-            document.getElementById("clicks").textContent = data.count;
-        });
-
-        document.addEventListener("mousemove", function(event) {
-            socket.emit("cursor_move", {x: event.clientX, y: event.clientY});
-            document.getElementById("myPosition").textContent = `Your cursor: (${event.clientX}, ${event.clientY})`;
-        });
-
-        socket.on("cursor_move", function(data) {
-            if (data.username === username) return;
-
-            if (!userCursors[data.username]) {
-                var cursorDiv = document.createElement("div");
-                cursorDiv.className = "user-cursor";
-                cursorDiv.style.backgroundColor = getColorForUsername(data.username);
-                var label = document.createElement("div");
-                label.className = "cursor-label";
-                label.textContent = data.username;
-                cursorDiv.appendChild(label);
-                document.body.appendChild(cursorDiv);
-                userCursors[data.username] = cursorDiv;
-            }
-
-            userCursors[data.username].style.left = data.x + "px";
-            userCursors[data.username].style.top = data.y + "px";
-        });
-
-        function getColorForUsername(name) {
-            var hash = 0;
-            for (var i = 0; i < name.length; i++) {
-                hash = name.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            var color = (hash & 0x00FFFFFF).toString(16).toUpperCase();
-            return "#" + ("000000" + color).slice(-6);
-        }
-
-        function sendMessage() {
-            var msgInput = document.getElementById("msg");
-            var message = msgInput.value;
-            socket.send(message);
-            msgInput.value = "";
-        }
-    </script>
-
+    <script src="{{ url_for('static', filename='logic.js') }}"></script>
     <script src="{{ url_for('static', filename='flappybird.js') }}"></script>
 </body>
 
