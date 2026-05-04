@@ -15,13 +15,13 @@
             background-color: #333;
             color: white;
         }
-        
+
         canvas {
             border: 2px solid white;
             display: block;
             margin: 20px auto;
         }
-        
+
         .cursor-position {
             position: fixed;
             top: 10px;
@@ -35,7 +35,7 @@
             z-index: 1000;
             color: black;
         }
-        
+
         .user-cursor {
             position: absolute;
             width: 10px;
@@ -44,7 +44,7 @@
             pointer-events: none;
             z-index: 100;
         }
-        
+
         .cursor-label {
             position: absolute;
             top: -20px;
@@ -56,7 +56,7 @@
             font-size: 10px;
             white-space: nowrap;
         }
-        
+
         .game-container {
             text-align: center;
         }
@@ -68,7 +68,7 @@
             z-index: 2000;
         }
         .start-screen.hidden { display: none; }
-        
+
         .chat-area {
             margin-top: 20px;
             border: 1px solid white;
@@ -88,20 +88,22 @@
     <p>Press Start to play!</p>
     <button onclick="startGame()">Start</button>
     </div>
-    
-    
+
+
     <div class="game-container">
         <h1>Flappy Bird - Multiplayer</h1>
         <p>Press SPACE, ARROW UP, or X to jump</p>
         <canvas id="board"></canvas>
     </div>
-    
+
     <div class="chat-area">
         <div id="messages"></div>
         <input id="msg" type="text" placeholder="Enter your message">
         <button onclick="sendMessage()">Send</button>
     </div>
-
+    <div id="audio_play">
+    <audio src="static/bgm_mario.mp3" autoplay loop></audio>
+    </div>
     <script>
         var socket = io();
         var username = "";

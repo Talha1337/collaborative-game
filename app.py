@@ -220,4 +220,4 @@ def handle_cursor_move(data):
 
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True)
+    socketio.run(app, port=8080, debug=True)
