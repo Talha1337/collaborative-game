@@ -27,7 +27,7 @@ class GameState:
         self.score = 0
         self.game_over = False
         self.last_pipe_time = time.time()
-        self.pipe_interval = 1.5
+        self.pipe_interval = 2.5
         self.board_width = 360
         self.board_height = 640
         self.pipe_width = 64
@@ -107,33 +107,30 @@ def game_loop():
 
 def spawn_pipe():
     """Spawn a new pipe"""
-
-    random_pipe_y = -game_state.pipe_height / 4 - random.random() * (
-        game_state.pipe_height / 2
-    )
     opening_space = game_state.board_height / 4
 
+    # Random position for the opening gap (where the bird can fly through)
+    gap_position = random.randint(80, int(game_state.board_height - opening_space - 80))
+
+    # Top pipe: extends from top of screen to gap_position
     top_pipe = {
         "x": game_state.board_width,
-        "y": random_pipe_y,
+        "y": -500,  # Start far above the screen
         "width": game_state.pipe_width,
-        "height": game_state.pipe_height,
+        "height": gap_position + 500,  # Extend down to the gap
         "passed": False,
     }
     game_state.pipes.append(top_pipe)
 
+    # Bottom pipe: starts after the opening and extends to bottom of screen
     bottom_pipe = {
         "x": game_state.board_width,
-        "y": random_pipe_y + game_state.pipe_height + opening_space,
+        "y": gap_position + opening_space,
         "width": game_state.pipe_width,
-        "height": game_state.board_height
-        - (random_pipe_y + game_state.pipe_height + opening_space),
+        "height": game_state.board_height - (gap_position + opening_space) + 500,
         "passed": False,
     }
     game_state.pipes.append(bottom_pipe)
-    print(
-        f"Spawned pipes at y={random_pipe_y:.2f} and y={random_pipe_y + game_state.pipe_height + opening_space:.2f}"
-    )
 
 
 def detect_collision(bird_x, bird_y, bird_width, bird_height, pipe):

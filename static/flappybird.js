@@ -114,7 +114,7 @@ function render() {
 
     for (let i = 0; i < pipeArray.length; i++) {
         let pipe = pipeArray[i];
-        if (pipe.y < 0) {
+        if (i % 2 === 0) {
             // Top pipe
             context.drawImage(topPipeImg, pipe.x, pipe.y, pipe.width, pipe.height);
         } else {
