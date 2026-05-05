@@ -95,6 +95,7 @@ def game_loop():
             {
                 "bird_y": game_state.bird_y,
                 "bird_x": game_state.bird_x,
+                "bird_velocity_y": game_state.velocity_y,
                 "pipes": game_state.pipes,
                 "score": int(game_state.score),
                 "game_over": game_state.game_over,
@@ -125,7 +126,8 @@ def spawn_pipe():
         "x": game_state.board_width,
         "y": random_pipe_y + game_state.pipe_height + opening_space,
         "width": game_state.pipe_width,
-        "height": game_state.board_height - (random_pipe_y + game_state.pipe_height + opening_space),
+        "height": game_state.board_height
+        - (random_pipe_y + game_state.pipe_height + opening_space),
         "passed": False,
     }
     game_state.pipes.append(bottom_pipe)
@@ -151,7 +153,12 @@ def handle_join(username):
     users[request.sid] = username
     join_room(username)
     date_time = datetime.now().strftime("%H:%M:%S")
-    data = {'username': 'System', 'message': f"{username} joined the chat", 'timestamp': date_time, 'user_id': request.sid}
+    data = {
+        "username": "System",
+        "message": f"{username} joined the chat",
+        "timestamp": date_time,
+        "user_id": request.sid,
+    }
     emit("message", data, broadcast=True)
     # Send current click count to the new user
     emit("click", {"username": username, "count": click_count}, room=username)
@@ -171,7 +178,12 @@ def handle_message(data):
     username = users.get(request.sid, "Anonymous")  # Get the user's name
     print(users)
     print(f"Received message from {request.sid}: {data}")
-    data = {'username': username, 'message': data, 'timestamp': date_time, 'user_id': request.sid}
+    data = {
+        "username": username,
+        "message": data,
+        "timestamp": date_time,
+        "user_id": request.sid,
+    }
     emit("message", data, broadcast=True)  # Send to everyone
 
 
@@ -181,7 +193,12 @@ def handle_disconnect():
     global game_loop_running
     username = users.pop(request.sid, "Anonymous")
     date_time = datetime.now().strftime("%H:%M:%S")
-    data = {'username': 'System', 'message': f"{username} left the chat", 'timestamp': date_time, 'user_id': request.sid}
+    data = {
+        "username": "System",
+        "message": f"{username} left the chat",
+        "timestamp": date_time,
+        "user_id": request.sid,
+    }
     emit("message", data, broadcast=True)
 
     # Stop game loop if no users left

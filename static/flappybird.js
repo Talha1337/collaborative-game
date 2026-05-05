@@ -59,6 +59,7 @@ function startGame() {
     socket.on("game_update", function(data) {
         bird.y = data.bird_y;
         bird.x = data.bird_x;
+        bird.velocity_y = data.bird_velocity_y;
         pipeArray = data.pipes;
         score = data.score;
         gameOver = data.game_over;
@@ -89,7 +90,25 @@ function render() {
     context.clearRect(0, 0, board.width, board.height);
 
     // Draw bird
-    context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+    // Calculate angle based on velocity
+    // Velocity positive = falling (look down), negative = rising (look up)
+    let angle = 0;
+    if (bird.velocity_y !== undefined) {
+        // Convert velocity to angle (in radians)
+        // You can scale this factor to control sensitivity
+        angle = Math.min(Math.max(bird.velocity_y * 0.05, -0.5), 0.5); // Clamp between -0.5 and 0.5 radians
+    }
+
+    // Save context state
+    context.save();
+
+    // Translate to bird center, rotate, then draw
+    context.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
+    context.rotate(angle);
+    context.drawImage(birdImg, -bird.width / 2, -bird.height / 2, bird.width, bird.height);
+
+    // Restore context state
+    context.restore();
 
     // Draw pipes
 
