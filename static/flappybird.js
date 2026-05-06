@@ -56,8 +56,8 @@ function startGame() {
     bottomPipeImg = new Image();
     bottomPipeImg.src = "./static/bottompipe.png";
 
-    // Initialize Socket.IO
-    socket = window.connection || io();
+    // Use the existing socket from logic.js (don't create a new one!)
+    // socket is already initialized in logic.js as a global variable
 
     // Listen for game state updates from server
     socket.on("game_update", function(data) {

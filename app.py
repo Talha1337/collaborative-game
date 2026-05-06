@@ -34,6 +34,11 @@ class GameState:
         self.pipe_height = 256
         self.velocity_x = -2
         self.players_jumped = set()  # Track which players jumped this frame
+        self.current_player_sid = (
+            None  # Track the current player for turn-based jumping
+        )
+        self.last_player_switch_time = time.time()
+        self.player_switch_time_interval = 1  # Switch player every 1 second
 
 
 game_state = GameState()
@@ -50,6 +55,17 @@ def game_loop():
     """Main game loop that updates physics and broadcasts state"""
     global game_state
     while game_loop_running:
+        # Switch current player based on time interval
+        current_time = time.time()
+        if (
+            game_state.current_player_sid is None
+            or current_time - game_state.last_player_switch_time
+            > game_state.player_switch_time_interval
+        ):
+            game_state.current_player_sid = random.choice(list(users.keys()))
+            game_state.last_player_switch_time = current_time
+            print(f"Current player: {users[game_state.current_player_sid]}")
+            print(f"All users: {users}")
         if not game_state.game_over and len(users) > 0:
             # Update bird physics
             game_state.velocity_y += game_state.gravity
@@ -101,6 +117,16 @@ def game_loop():
                 "game_over": game_state.game_over,
             },
         )
+        # Broadcast current player control status
+        socketio.emit(
+            "current_player",
+            {
+                "current_player_sid": game_state.current_player_sid,
+                "current_player_username": users.get(
+                    game_state.current_player_sid, "Unknown"
+                ),
+            },
+        )
 
         time.sleep(0.02)  # ~50 FPS
 
@@ -146,9 +172,9 @@ def detect_collision(bird_x, bird_y, bird_width, bird_height, pipe):
 # Handle new user joining
 @socketio.on("join")
 def handle_join(username):
-    global game_loop_thread, game_loop_running
-    users[request.sid] = username
+    global game_loop_thread, game_loop_running, game_state
     join_room(username)
+    users[request.sid] = username
     date_time = datetime.now().strftime("%H:%M:%S")
     data = {
         "username": "System",
@@ -162,6 +188,11 @@ def handle_join(username):
 
     # Broadcast updated user list to all clients
     emit("users_list", {"users": list(users.values())}, broadcast=True)
+
+    # Initialize current player if not set yet
+    if game_state.current_player_sid is None and len(users) > 0:
+        game_state.current_player_sid = request.sid
+        game_state.last_player_switch_time = time.time()
 
     # Start game loop if not already running
     if not game_loop_running and len(users) > 0:
@@ -213,6 +244,10 @@ def handle_disconnect():
 @socketio.on("player_jump")
 def handle_player_jump():
     global game_state
+    print(request.sid, "attempted to jump")
+    print("Current player SID:", game_state.current_player_sid)
+    if request.sid != game_state.current_player_sid:
+        return  # Ignore jump if it's not the current player's turn
     if not game_state.game_over:
         game_state.velocity_y = -6
     else:
