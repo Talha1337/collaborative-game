@@ -33,12 +33,16 @@ let score = 0;
 let audioStarted = false;
 let audio = document.getElementsByTagName('audio');
 function startGame() {
+    // First, prompt for username and join the game
+    if (!joinGame()) {
+        return;  // If join failed, don't start the game
+    }
+    
     document.getElementById('startScreen').classList.add('hidden');
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
     context = board.getContext("2d");
-
     //load images
     birdImg = new Image();
     birdImg.src = "./static/flappybird.png";

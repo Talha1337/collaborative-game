@@ -160,6 +160,9 @@ def handle_join(username):
     # Send current click count to the new user
     emit("click", {"username": username, "count": click_count}, room=username)
 
+    # Broadcast updated user list to all clients
+    emit("users_list", {"users": list(users.values())}, broadcast=True)
+
     # Start game loop if not already running
     if not game_loop_running and len(users) > 0:
         game_loop_running = True
@@ -197,6 +200,9 @@ def handle_disconnect():
         "user_id": request.sid,
     }
     emit("message", data, broadcast=True)
+
+    # Broadcast updated user list to all clients
+    emit("users_list", {"users": list(users.values())}, broadcast=True)
 
     # Stop game loop if no users left
     if len(users) == 0:
