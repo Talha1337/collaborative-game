@@ -109,7 +109,7 @@ function setupSocketListeners() {
     });
 
     socket.on("click", function(data) {
-        document.getElementById("clicks").textContent = data.count;
+        // document.getElementById("clicks").textContent = data.count;
     });
 
     // Listen for cursor position updates from other users
