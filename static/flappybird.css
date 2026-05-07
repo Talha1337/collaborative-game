@@ -6,7 +6,10 @@ body {
 #board {
     /* background-color: skyblue; */
     background-image: url("./flappybirdbg.png");
-    height: 640px;
-    width: 360px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 80vh;
+    aspect-ratio: 360 / 640;
     display: block;
 }

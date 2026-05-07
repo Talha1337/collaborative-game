@@ -31,13 +31,49 @@ let bottomPipeImg;
 let gameOver = false;
 let score = 0;
 let audioStarted = false;
-let audio = document.getElementsByTagName('audio');
+let music1 = document.getElementById("music1");
+let music2 = document.getElementById("music2");
+let switchedMusic = false;
+
+
+function fadeOut(audio, duration = 1000) {
+    let step = 50;
+    let volumeStep = audio.volume / (duration / step);
+
+    let fade = setInterval(() => {
+        audio.volume = Math.max(0, audio.volume - volumeStep);
+
+        if (audio.volume <= 0) {
+            audio.pause();
+            clearInterval(fade);
+        }
+    }, step);
+}
+
+
+function fadeIn(audio, duration = 1000) {
+
+    audio.currentTime = 45;
+    audio.play();
+
+    let step = 50;
+    let volumeStep = 1 / (duration / step);
+
+    let fade = setInterval(() => {
+        audio.volume = Math.min(1, audio.volume + volumeStep);
+
+        if (audio.volume >= 1) {
+            clearInterval(fade);
+        }
+    }, step);
+}
+
 function startGame() {
     // First, prompt for username and join the game
     if (!joinGame()) {
         return;  // If join failed, don't start the game
     }
-    
+
     document.getElementById('startScreen').classList.add('hidden');
     board = document.getElementById("board");
     board.height = boardHeight;
@@ -67,7 +103,12 @@ function startGame() {
         pipeArray = data.pipes;
         score = data.score;
         gameOver = data.game_over;
+        if (score >= 10 && !switchedMusic) {
+            switchedMusic = true;
 
+            fadeOut(music1, 1000);
+            fadeIn(music2, 1000);
+        }
         // Render the game
         render();
     });
@@ -79,7 +120,7 @@ function startGame() {
             socket.emit("player_jump");
 
             if (!audioStarted) {
-            audio[0].play();
+            music1.play();
             audioStarted = true;
         }
         }
@@ -130,8 +171,21 @@ function render() {
     // Draw score
     context.fillStyle = "white";
     context.font = "45px sans-serif";
-    context.fillText(score, 5, 45);
+    context.fillText(score, 10, 45);
+    if (score >= 5 && score < 7) {
+        if (Math.floor(Date.now() / 300) % 2 === 0) {
 
+            context.save();
+
+            context.fillStyle = "yellow";
+            context.font = "20px sans-serif";
+            context.textAlign = "center";
+
+            context.fillText("Music change at 10!", board.width / 2, 100);
+
+            context.restore();
+        }
+    }
     if (gameOver) {
         context.fillText("GAME OVER", 5, 90);
     }

@@ -13,7 +13,7 @@ body {
 
 .main-container {
     display: grid; /* Ensures appropriate arrangement of users, game and chat */
-    grid-template-columns: auto 1fr auto; /* Users sidebar, game, chat */
+    grid-template-columns: 350px 1fr 350px; /* Users sidebar, game, chat */
     align-items: start;
     gap: 24px;
     width: 100%;
@@ -71,6 +71,7 @@ canvas {
     border: 2px solid white;
     display: block;
     margin: 10px auto;
+    z-index: 0;
 }
 
 /* ── Start screen overlay ────────────────────────────── */
