@@ -155,6 +155,10 @@ def game_loop():
 
 def spawn_pipe():
     """Spawn a new pipe"""
+    print("spawning pipe")
+    if len(game_state.pipes) >= 5:
+        game_state.pipes.pop(0)  # Remove oldest pipe if too many on screen
+        game_state.pipes.pop(0)  # Remove the corresponding top and bottom pipe
     opening_space = game_state.board_height / 4
 
     # Random position for the opening gap (where the bird can fly through)
@@ -280,20 +284,20 @@ def handle_player_jump():
 
 
 # Handle cursor position updates
-@socketio.on("cursor_move")
-def handle_cursor_move(data):
-    username = users.get(request.sid, "Anonymous")
-    cursor_positions[request.sid] = {
-        "username": username,
-        "x": data["x"],
-        "y": data["y"],
-    }
-    emit(
-        "cursor_move",
-        {"username": username, "x": data["x"], "y": data["y"]},
-        broadcast=True,
-    )
+# @socketio.on("cursor_move")
+# def handle_cursor_move(data):
+#     username = users.get(request.sid, "Anonymous")
+#     cursor_positions[request.sid] = {
+#         "username": username,
+#         "x": data["x"],
+#         "y": data["y"],
+#     }
+#     emit(
+#         "cursor_move",
+#         {"username": username, "x": data["x"], "y": data["y"]},
+#         broadcast=True,
+#     )
 
 
 if __name__ == "__main__":
-    socketio.run(app, port=8080, debug=True)
+    socketio.run(app, port=8080, debug=False)

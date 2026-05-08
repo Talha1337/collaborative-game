@@ -33,6 +33,8 @@ let score = 0;
 let audioStarted = false;
 let music1 = document.getElementById("music1");
 let music2 = document.getElementById("music2");
+music1.volume = 0.3;
+music2.volume = 0.3;
 let switchedMusic = false;
 
 
@@ -60,13 +62,15 @@ function fadeIn(audio, duration = 1000) {
     let volumeStep = 1 / (duration / step);
 
     let fade = setInterval(() => {
-        audio.volume = Math.min(1, audio.volume + volumeStep);
+        audio.volume = Math.min(0.3, audio.volume + volumeStep);
 
-        if (audio.volume >= 1) {
+        if (audio.volume >= 0.3) {
             clearInterval(fade);
         }
     }, step);
 }
+
+
 
 function startGame() {
     // First, prompt for username and join the game
