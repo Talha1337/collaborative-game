@@ -4,6 +4,7 @@ import threading
 import time
 import random
 from datetime import datetime
+from gevent.pywsgi import WSGIServer
 
 # Debug logging utility
 DEBUG = False  # Set to True to enable debug prints
@@ -299,5 +300,6 @@ def handle_player_jump():
 #     )
 
 
-if __name__ == "__main__":
-    socketio.run(app, port=8080, debug=False)
+# if __name__ == "__main__":
+#     http_server = WSGIServer(("0.0.0.0", 8080), app)
+#     http_server.serve_forever()
