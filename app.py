@@ -300,6 +300,5 @@ def handle_player_jump():
 #     )
 
 
-# if __name__ == "__main__":
-#     http_server = WSGIServer(("0.0.0.0", 8080), app)
-#     http_server.serve_forever()
+if __name__ == "__main__":
+    socketio.run(app, host="0.0.0.0", port=5000)
