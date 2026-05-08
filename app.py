@@ -5,6 +5,15 @@ import time
 import random
 from datetime import datetime
 
+# Debug logging utility
+DEBUG = False  # Set to True to enable debug prints
+
+
+def debug(*args, **kwargs):
+    if DEBUG:
+        print(*args, **kwargs)
+
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "your_secret_key"
 
@@ -64,8 +73,8 @@ def game_loop():
         ):
             game_state.current_player_sid = random.choice(list(users.keys()))
             game_state.last_player_switch_time = current_time
-            print(f"Current player: {users[game_state.current_player_sid]}")
-            print(f"All users: {users}")
+            debug(f"Current player: {users[game_state.current_player_sid]}")
+            debug(f"All users: {users}")
         if not game_state.game_over and len(users) > 0:
             # Update bird physics
             game_state.velocity_y += game_state.gravity
@@ -97,22 +106,18 @@ def game_loop():
                 if detect_collision(game_state.bird_x, game_state.bird_y, 34, 24, pipe):
                     game_state.game_over = True
 
-
-
             if game_state.game_over:
-                    date_time = datetime.now().strftime("%H:%M:%S")
-                    username = users.get(game_state.current_player_sid, "Anonymous")  # Get the user's name
-                    data = {
-                        "username": "System",
-                        "message": f"{username} fumbled the bag for us",
-                        "timestamp": date_time,
-                        "user_id": game_state.current_player_sid,
-                    }
-                    socketio.emit("message", data)  # Send to everyone
-
-
-
-
+                date_time = datetime.now().strftime("%H:%M:%S")
+                username = users.get(
+                    game_state.current_player_sid, "Anonymous"
+                )  # Get the user's name
+                data = {
+                    "username": "System",
+                    "message": f"{username} fumbled the bag for us",
+                    "timestamp": date_time,
+                    "user_id": game_state.current_player_sid,
+                }
+                socketio.emit("message", data)  # Send to everyone
 
             # Remove off-screen pipes
             game_state.pipes = [
@@ -200,8 +205,6 @@ def handle_join(username):
         "user_id": request.sid,
     }
     emit("message", data, broadcast=True)
-    # Send current click count to the new user
-    emit("click", {"username": username, "count": click_count}, room=username)
 
     # Broadcast updated user list to all clients
     emit("users_list", {"users": list(users.values())}, broadcast=True)
@@ -224,8 +227,8 @@ def handle_message(data):
     global users
     date_time = datetime.now().strftime("%H:%M:%S")
     username = users.get(request.sid, "Anonymous")  # Get the user's name
-    print(users)
-    print(f"Received message from {request.sid}: {data}")
+    debug(users)
+    debug(f"Received message from {request.sid}: {data}")
     data = {
         "username": username,
         "message": data,
@@ -261,8 +264,8 @@ def handle_disconnect():
 @socketio.on("player_jump")
 def handle_player_jump():
     global game_state
-    print(request.sid, "attempted to jump")
-    print("Current player SID:", game_state.current_player_sid)
+    debug(request.sid, "attempted to jump")
+    debug("Current player SID:", game_state.current_player_sid)
     if request.sid != game_state.current_player_sid:
         return  # Ignore jump if it's not the current player's turn
     if not game_state.game_over:
@@ -274,15 +277,6 @@ def handle_player_jump():
         game_state.pipes = []
         game_state.score = 0
         game_state.game_over = False
-
-
-@socketio.on("click")
-def handle_click():
-    print("click received")
-    global click_count
-    click_count += 1
-    username = users.get(request.sid, "Anonymous")
-    emit("click", {"username": username, "count": click_count}, broadcast=True)
 
 
 # Handle cursor position updates

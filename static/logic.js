@@ -1,6 +1,9 @@
 
-// Initialize socket but don't join yet
-console.log("logic.js script loaded");
+// Debug logging utility
+const DEBUG = false; // Set to true to enable console logging
+function debug(...args) {
+    if (DEBUG) console.log(...args);
+}
 
 // Initialize socket but don't join yet
 var socket = null;
@@ -13,7 +16,6 @@ function initSocket() {
     if (!socket) {
         socket = io();
         socket.on('connect', function() {
-            console.log('Connected to server');
         });
         socket.on('connect_error', function(error) {
             console.error('Connection error:', error);
@@ -74,16 +76,16 @@ function setupUserListListener() {
 
 // Set up all socket event listeners after socket is ready
 function setupSocketListeners() {
-    console.log("Setting up socket listeners");
+    debug("Setting up socket listeners");
     if (!socket) return;
-    console.log("Socket ID in setupSocketListeners:", socket.id);
+    debug("Socket ID in setupSocketListeners:", socket.id);
 
     // Listen for current player updates
     socket.on("current_player", function(data) {
-        console.log("current_player event received:", data);
+        debug("current_player event received:", data);
         var gameContainer = document.querySelector(".game-container");
         var isMyTurn = (data.current_player_sid === socket.id);
-        console.log("Current player SID:", data.current_player_sid, "My SID:", socket.id, "Is my turn?", isMyTurn);
+        debug("Current player SID:", data.current_player_sid, "My SID:", socket.id, "Is my turn?", isMyTurn);
         if (isMyTurn) {
             gameContainer.style.backgroundColor = "#ff4444";  // Red for active player
             gameContainer.style.boxShadow = "0 0 20px rgba(255, 68, 68, 0.8)";  // Glow effect
@@ -106,10 +108,6 @@ function setupSocketListeners() {
             messageElement.classList.add("other-message");
         }
         messages.scrollTop = messages.scrollHeight;
-    });
-
-    socket.on("click", function(data) {
-        // document.getElementById("clicks").textContent = data.count;
     });
 
     // Listen for cursor position updates from other users
@@ -136,10 +134,8 @@ function setupSocketListeners() {
 // Call setupSocketListeners after socket is initialized
 var setupAttempts = 0;
 var setupInterval = setInterval(function() {
-    console.log("Setup attempt", setupAttempts, "- Socket ready?", socket ? "yes" : "no");
 
     if (socket) {
-        console.log("Socket ready, setting up listeners");
         setupUserListListener();
         setupSocketListeners();
         clearInterval(setupInterval);
@@ -147,17 +143,12 @@ var setupInterval = setInterval(function() {
 
     setupAttempts++;
     if (setupAttempts > 50) {
-        console.log("Max attempts reached");
         clearInterval(setupInterval);
     }
 }, 100);
 
-console.log("Setup interval started");
+debug("Setup interval started");
 
-// Listen for clicks anywhere on the page
-document.addEventListener("click", function() {
-    if (socket) socket.emit("click");
-});
 
 document.addEventListener("keydown", function(event) {
     if (socket && (event.code === "Space")) {
@@ -173,10 +164,6 @@ function sendMessage() {
         socket.send(message);
         msgInput.value = "";
     }
-}
-
-function onClick() {
-    if (socket) socket.emit("click");  // Just notify server, don't increment locally
 }
 
 window.connection = socket;
