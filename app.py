@@ -97,6 +97,23 @@ def game_loop():
                 if detect_collision(game_state.bird_x, game_state.bird_y, 34, 24, pipe):
                     game_state.game_over = True
 
+
+
+            if game_state.game_over:
+                    date_time = datetime.now().strftime("%H:%M:%S")
+                    username = users.get(game_state.current_player_sid, "Anonymous")  # Get the user's name
+                    data = {
+                        "username": "System",
+                        "message": f"{username} fumbled the bag for us",
+                        "timestamp": date_time,
+                        "user_id": game_state.current_player_sid,
+                    }
+                    socketio.emit("message", data)  # Send to everyone
+
+
+
+
+
             # Remove off-screen pipes
             game_state.pipes = [
                 p for p in game_state.pipes if p["x"] > -game_state.pipe_width

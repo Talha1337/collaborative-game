@@ -32,7 +32,7 @@ function joinGame() {
             return false;
         }
     }
-    
+
     if (socket && socket.connected) {
         socket.emit("join", username);
         gameStarted = true;
@@ -137,14 +137,14 @@ function setupSocketListeners() {
 var setupAttempts = 0;
 var setupInterval = setInterval(function() {
     console.log("Setup attempt", setupAttempts, "- Socket ready?", socket ? "yes" : "no");
-    
+
     if (socket) {
         console.log("Socket ready, setting up listeners");
         setupUserListListener();
         setupSocketListeners();
         clearInterval(setupInterval);
     }
-    
+
     setupAttempts++;
     if (setupAttempts > 50) {
         console.log("Max attempts reached");

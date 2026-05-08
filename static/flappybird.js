@@ -103,7 +103,7 @@ function startGame() {
         pipeArray = data.pipes;
         score = data.score;
         gameOver = data.game_over;
-        if (score >= 10 && !switchedMusic) {
+        if (score >= 7 && !switchedMusic) {
             switchedMusic = true;
 
             fadeOut(music1, 1000);
@@ -172,7 +172,7 @@ function render() {
     context.fillStyle = "white";
     context.font = "45px sans-serif";
     context.fillText(score, 10, 45);
-    if (score >= 5 && score < 7) {
+    if (score >= 3 && score < 5) {
         if (Math.floor(Date.now() / 300) % 2 === 0) {
 
             context.save();
@@ -181,7 +181,7 @@ function render() {
             context.font = "20px sans-serif";
             context.textAlign = "center";
 
-            context.fillText("Music change at 10!", board.width / 2, 100);
+            context.fillText("Surprise at 7!", board.width / 2, 100);
 
             context.restore();
         }
